@@ -42,12 +42,16 @@ class MovieCommentSpider(Spider):
     def start_requests(self):
         for url in self.start_urls:
             url = urllib.parse.urljoin(url, "comments")
-            print(url)
-            yield Request(url=url, callback=self.parse, headers=self.headers)
+            for i in range(0, 20):
+                url = urllib.parse.urljoin(url, f"?start={i}")
+                print(url)
+                yield Request(url=url, callback=self.parse, headers=self.headers)
 
     def parse(self, response):
         selector = Selector(response)
         comment = MovieComment()
-        comment['content'] = selector.xpath(
-            '//*[@id="comments"]/div[1]/div[2]/p/span/text()').extract_first()
-        yield comment
+
+        for j in range(1, 21):
+            comment['content'] = selector.xpath(
+                f'//*[@id="comments"]/div[{j}]/div[2]/p/span/text()').extract_first()
+            yield comment
